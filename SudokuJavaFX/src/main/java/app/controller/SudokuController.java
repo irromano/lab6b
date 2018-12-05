@@ -60,6 +60,9 @@ public class SudokuController implements Initializable {
 	@FXML
 	private HBox hboxNumbers;
 	
+	//TODO:
+	//Added next two labels
+	
 	@FXML
 	private Label gameStateLabel;
 	
