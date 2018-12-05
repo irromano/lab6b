@@ -25,6 +25,16 @@ public enum eGameDifficulty {
 	public int getiDifficulty() {
 		return iDifficulty;
 	}
+	
+	public int maxMistakes() {
+		if(iDifficulty == 100) {
+			return 2;
+		}else if(iDifficulty == 500) {
+			return 4;
+		}else {
+			return 6;
+		}
+	}
 
 	@Override
 	public String toString() {

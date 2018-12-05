@@ -59,6 +59,9 @@ public class SudokuController implements Initializable {
 
 	@FXML
 	private HBox hboxNumbers;
+	
+	@FXML
+	private Label gameStateLabel;
 
 	private int iCellSize = 45;
 	private static final DataFormat myFormat = new DataFormat("com.cisc181.Data.Cell");
@@ -86,6 +89,7 @@ public class SudokuController implements Initializable {
 	private void btnStartGame(ActionEvent event) {
 		CreateSudokuInstance();
 		BuildGrids();
+		gameStateLabel.setText("");
 	}
 
 	/**
@@ -101,7 +105,7 @@ public class SudokuController implements Initializable {
 	}
 
 	/**
-	 * BuildGrid - This method will bild all the grid objects (top/sudoku/numbers)
+	 * BuildGrid - This method will build all the grid objects (top/sudoku/numbers)
 	 * 
 	 * @version 1.5
 	 * @since Lab #5
@@ -324,7 +328,10 @@ public class SudokuController implements Initializable {
 
 							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue())) {
 								if (game.getShowHints()) {
-
+									s.addMistakes();
+									if(s.getMistakes() == eGD.maxMistakes()) {
+										gameStateLabel.setText("GAME OVER");
+									}
 								}
 
 							}
