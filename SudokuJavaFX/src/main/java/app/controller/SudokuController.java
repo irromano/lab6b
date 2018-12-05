@@ -62,6 +62,9 @@ public class SudokuController implements Initializable {
 	
 	@FXML
 	private Label gameStateLabel;
+	
+	@FXML
+	private Label numMistakesLabel;
 
 	private int iCellSize = 45;
 	private static final DataFormat myFormat = new DataFormat("com.cisc181.Data.Cell");
@@ -90,6 +93,7 @@ public class SudokuController implements Initializable {
 		CreateSudokuInstance();
 		BuildGrids();
 		gameStateLabel.setText("");
+		numMistakesLabel.setText("Mistakes: 0");
 	}
 
 	/**
@@ -329,7 +333,8 @@ public class SudokuController implements Initializable {
 							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue())) {
 								if (game.getShowHints()) {
 									s.addMistakes();
-									if(s.getMistakes() == eGD.maxMistakes()) {
+									numMistakesLabel.setText("Mistakes: "+s.getMistakes());
+									if(s.getMistakes() >= eGD.maxMistakes()) {
 										gameStateLabel.setText("GAME OVER");
 									}
 								}
