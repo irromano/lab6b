@@ -96,7 +96,7 @@ public class SudokuController implements Initializable {
 		CreateSudokuInstance();
 		BuildGrids();
 		gameStateLabel.setText("");
-		numMistakesLabel.setText("Mistakes: 0");
+		numMistakesLabel.setText("Mistakes: " + s.getMistakes());
 	}
 
 	/**
@@ -336,12 +336,15 @@ public class SudokuController implements Initializable {
 							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue())) {
 								if (game.getShowHints()) {
 									s.addMistakes();
-									numMistakesLabel.setText("Mistakes: "+s.getMistakes());
-									if(s.getMistakes() >= eGD.maxMistakes()) {
+									numMistakesLabel.setText("Mistakes: " + s.getMistakes());
+									if(s.getMistakes() >= eGD.getMaxMistakes()) {
 										gameStateLabel.setText("GAME OVER");
 									}
 								}
 
+							}
+							if (s.isSudoku()) {
+								gameStateLabel.setText("GAME WON");
 							}
 
 							//	This is the code that is actually taking the cell value from the drag-from 

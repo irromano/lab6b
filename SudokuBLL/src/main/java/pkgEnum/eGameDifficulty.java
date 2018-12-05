@@ -9,6 +9,8 @@ public enum eGameDifficulty {
 	EASY(100), MEDIUM(500), HARD(1000);
 
 	private final int iDifficulty;
+	
+	private final int MaxMistakes;
 
 	private static final Map<Integer, eGameDifficulty> lookup = new HashMap<Integer, eGameDifficulty>();
 
@@ -20,20 +22,22 @@ public enum eGameDifficulty {
 
 	private eGameDifficulty(int iDifficulty) {
 		this.iDifficulty = iDifficulty;
+		if (this.iDifficulty >= 1000) {
+			MaxMistakes = 3;
+		} else if (this.iDifficulty >= 500) {
+			MaxMistakes = 4;
+		} else {
+			MaxMistakes = 5;
+		}
 	}
 
 	public int getiDifficulty() {
 		return iDifficulty;
 	}
+
 	
-	public int maxMistakes() {
-		if(iDifficulty == 100) {
-			return 2;
-		}else if(iDifficulty == 500) {
-			return 4;
-		}else {
-			return 6;
-		}
+	public int getMaxMistakes() {
+		return MaxMistakes;
 	}
 
 	@Override
