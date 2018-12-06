@@ -270,6 +270,8 @@ public class SudokuController implements Initializable {
 				paneTarget.setOnMouseClicked(e -> {
 					System.out.println(paneTarget.getCell().getiCellValue());
 				});
+				
+				
 
 				// Fire this method as something is being dragged over a cell
 				// I'm checking the cell value... if it's not zero... don't let it be dropped
@@ -290,7 +292,7 @@ public class SudokuController implements Initializable {
 				paneTarget.setOnDragEntered(new EventHandler<DragEvent>() {
 					public void handle(DragEvent event) {
 						/* show to the user that it is an actual gesture target */
-						if (event.getGestureSource() != paneTarget && event.getDragboard().hasContent(myFormat)) {
+						if (event.getGestureSource() != paneTarget && event.getDragboard().hasContent(myFormat)) { 
 							Dragboard db = event.getDragboard();
 							Cell CellFrom = (Cell) db.getContent(myFormat);
 							Cell CellTo = (Cell) paneTarget.getCell();
@@ -334,12 +336,10 @@ public class SudokuController implements Initializable {
 							Cell CellFrom = (Cell) db.getContent(myFormat);
 
 							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue())) {
-								if (game.getShowHints()) {
-									s.addMistakes();
-									numMistakesLabel.setText("Mistakes: " + s.getMistakes());
-									if(s.getMistakes() >= eGD.getMaxMistakes()) {
-										gameStateLabel.setText("GAME OVER");
-									}
+								s.addMistakes();
+								numMistakesLabel.setText("Mistakes: " + s.getMistakes());
+								if(s.getMistakes() >= eGD.getMaxMistakes()) {
+									gameStateLabel.setText("GAME OVER");
 								}
 
 							}
@@ -362,6 +362,26 @@ public class SudokuController implements Initializable {
 				});
 
 				gridPaneSudoku.add(paneTarget, iCol, iRow); // Add the pane to the grid
+				// This is going to fire if the number from the number grid is dragged
+				// Find the cell in the pane, put it on the Dragboard
+				
+				//	Pay close attention... this is the method you must code to make your item draggable.
+				//	If you want a paneTarget draggable (so you can drag it into the trash), you'll have to 
+				//	implement a simliar method
+				paneTarget.setOnDragDetected(new EventHandler<MouseEvent>() {
+					public void handle(MouseEvent event) {
+
+						/* allow any transfer mode */
+						Dragboard db = paneTarget.startDragAndDrop(TransferMode.ANY);
+
+						/* put a string on dragboard */
+						// Put the Cell on the clipboard, on the other side, cast as a cell
+						ClipboardContent content = new ClipboardContent();
+						content.put(myFormat, paneTarget.getCell());
+						db.setContent(content);
+						event.consume();
+					}
+				});
 			}
 
 		}
