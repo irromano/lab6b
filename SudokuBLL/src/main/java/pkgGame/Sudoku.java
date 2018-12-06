@@ -37,7 +37,7 @@ public class Sudoku extends LatinSquare implements Serializable {
 	private int iSize;
 
 	/**
-	 * iSqrtSize - SquareRoot of the iSize. If the iSize is 9, iSqrtSize will be
+	 * iSqrtSize - SquareRoot of the iSize. If the iSize is 9, iSqrtSize will be 
 	 * calculated as 3
 	 * 
 	 * @version 1.2
