@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -15,23 +17,24 @@
    <bottom>
       <HBox alignment="CENTER" prefHeight="82.0" prefWidth="306.0" BorderPane.alignment="CENTER">
          <children>
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="81.0" prefWidth="107.0">
+            <SplitPane orientation="VERTICAL" prefHeight="82.0" prefWidth="90.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                      <children>
-                        <Label fx:id="gameStateLabel" layoutX="39.0" layoutY="6.0" />
-                     </children>
-                  </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                     <children>
-                        <Label fx:id="numMistakesLabel" layoutX="39.0" layoutY="10.0" />
+                        <Label fx:id="numMistakesLabel" layoutY="-3.0" prefHeight="43.0" prefWidth="89.0" />
                      </children>
                   </AnchorPane>
               </items>
             </SplitPane>
             <Button mnemonicParsing="false" onAction="#btnStartGame" text="Start Game" />
             <Button mnemonicParsing="false" text="End Game" />
-         </children></HBox>
+            <ImageView fx:id="trashcan" fitHeight="74.0" fitWidth="60.0" onDragDropped="#trashDrop" onDragEntered="#trashOver" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../img/TrashCan.png" />
+               </image>
+            </ImageView>
+         </children>
+      </HBox>
    </bottom>
    <top>
       <HBox alignment="CENTER" prefHeight="27.0" prefWidth="200.0" BorderPane.alignment="CENTER">

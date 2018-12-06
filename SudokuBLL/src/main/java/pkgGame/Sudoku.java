@@ -48,7 +48,7 @@ public class Sudoku extends LatinSquare implements Serializable {
 	
 	private int mistakes;
 	
-	private boolean mistakeMode;
+	private boolean gameOn;
 
 	private HashMap<Integer, SudokuCell> cells = new HashMap<Integer, SudokuCell>();
 
@@ -65,7 +65,7 @@ public class Sudoku extends LatinSquare implements Serializable {
 		super();
 		this.eGameDifficulty = eGameDifficulty.EASY;
 		mistakes = 0;
-		mistakeMode = false;
+		gameOn = true;
 	}
 	
 	public void addMistakes() {
@@ -74,6 +74,14 @@ public class Sudoku extends LatinSquare implements Serializable {
 	
 	public int getMistakes() {
 		return mistakes;
+	}
+
+	public boolean isGameOn() {
+		return gameOn;
+	}
+
+	public void setGameOn(boolean gameOn) {
+		this.gameOn = gameOn;
 	}
 
 	/**

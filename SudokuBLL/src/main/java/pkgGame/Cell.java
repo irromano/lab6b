@@ -7,6 +7,8 @@ public class Cell implements Serializable {
 	private int iRow;
 	private int iCol;
 	private int iCellValue;
+	private boolean mistakeMode = false;
+	private boolean original = true;
 
 	public Cell(int iRow, int iCol) {
 		super();
@@ -20,6 +22,23 @@ public class Cell implements Serializable {
 
 	public int getiCol() {
 		return iCol;
+	}
+	
+	public boolean isMistakeMode() {
+		return mistakeMode;
+	}
+
+	public void setMistakeMode(boolean mistakeMode) {
+		this.mistakeMode = mistakeMode;
+	}
+	
+
+	public boolean isOriginal() {
+		return original;
+	}
+
+	public void setOriginal(boolean original) {
+		this.original = original;
 	}
 
 	public int getiCellValue() {

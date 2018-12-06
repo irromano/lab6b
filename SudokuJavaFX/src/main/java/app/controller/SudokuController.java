@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 
 import app.Game;
 import app.helper.SudokuCell;
+import app.helper.Trashcan;
 import app.helper.SudokuStyler;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -68,6 +69,9 @@ public class SudokuController implements Initializable {
 	
 	@FXML
 	private Label numMistakesLabel;
+	
+	@FXML
+	private ImageView trashcan;
 
 	private int iCellSize = 45;
 	private static final DataFormat myFormat = new DataFormat("com.cisc181.Data.Cell");
@@ -118,6 +122,8 @@ public class SudokuController implements Initializable {
 	 * @since Lab #5
 	 * @param event
 	 */
+	
+	
 	private void BuildGrids() {
 
 		// Paint the top grid on the form
@@ -138,6 +144,22 @@ public class SudokuController implements Initializable {
 		hboxNumbers.setPadding((new Insets(25, 25, 25, 25)));
 		hboxNumbers.getChildren().add(gridNumbers);
 
+	}
+	@FXML
+	public void trashDrop(DragEvent event) {
+		Dragboard db = event.getDragboard();
+		boolean success = false;
+
+		//	This is the code that resets the cell
+		success = true;
+		event.setDropCompleted(success);
+		event.consume();
+	}
+	@FXML
+	public void trashOver(DragEvent event) {
+		/* show to the user that it is an actual gesture target */
+		Dragboard db = event.getDragboard();
+		event.consume();
 	}
 
 	/**
@@ -237,6 +259,14 @@ public class SudokuController implements Initializable {
 	 * @param event
 	 */
 	
+	/**
+	 * @return
+	 */
+	/**
+	 * @return
+	 */
+	
+	
 	private GridPane BuildSudokuGrid() {
 
 		Sudoku s = this.game.getSudoku();
@@ -278,7 +308,7 @@ public class SudokuController implements Initializable {
 				// (show the circle-with-line-through)
 				paneTarget.setOnDragOver(new EventHandler<DragEvent>() {
 					public void handle(DragEvent event) {
-						if (event.getGestureSource() != paneTarget && event.getDragboard().hasContent(myFormat)) {
+						if (event.getGestureSource() != paneTarget && event.getDragboard().hasContent(myFormat) && s.isGameOn()) {
 							// Don't let the user drag over items that already have a cell value set
 							if (paneTarget.getCell().getiCellValue() == 0) {
 								event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
@@ -292,7 +322,7 @@ public class SudokuController implements Initializable {
 				paneTarget.setOnDragEntered(new EventHandler<DragEvent>() {
 					public void handle(DragEvent event) {
 						/* show to the user that it is an actual gesture target */
-						if (event.getGestureSource() != paneTarget && event.getDragboard().hasContent(myFormat)) { 
+						if (event.getGestureSource() != paneTarget && event.getDragboard().hasContent(myFormat) && s.isGameOn()) { 
 							Dragboard db = event.getDragboard();
 							Cell CellFrom = (Cell) db.getContent(myFormat);
 							Cell CellTo = (Cell) paneTarget.getCell();
@@ -310,15 +340,18 @@ public class SudokuController implements Initializable {
 
 				paneTarget.setOnDragExited(new EventHandler<DragEvent>() {
 					public void handle(DragEvent event) {
-						SudokuStyler.RemoveGridStyling(gridPaneSudoku);
-						ObservableList<Node> childs = paneTarget.getChildren();
-						for (Object o : childs) {
-							if (o instanceof Pane)
-								paneTarget.getChildren().remove(o);
+						if (!paneTarget.getCell().isMistakeMode()  && s.isGameOn()) {
+							SudokuStyler.RemoveGridStyling(gridPaneSudoku);
+							ObservableList<Node> childs = paneTarget.getChildren();
+							for (Object o : childs) {
+								if (o instanceof Pane)
+									paneTarget.getChildren().remove(o);
+							}
+							event.consume();
 						}
-						event.consume();
 					}
 				});
+				
 
 				paneTarget.setOnDragDropped(new EventHandler<DragEvent>() {
 					public void handle(DragEvent event) {
@@ -326,7 +359,7 @@ public class SudokuController implements Initializable {
 						boolean success = false;
 						Cell CellTo = (Cell) paneTarget.getCell();
 
-						//TODO: This is where you'll find mistakes.  
+						//		This is where you'll find mistakes.  
 						//		Keep track of mistakes... as an attribute of Sudoku... start the attribute
 						//		at zero, and expose a AddMistake(int) method in Sudoku to add the mistake
 						//		write a getter so you can the value
@@ -335,16 +368,17 @@ public class SudokuController implements Initializable {
 						if (db.hasContent(myFormat)) {
 							Cell CellFrom = (Cell) db.getContent(myFormat);
 
-							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue())) {
+							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue()) && s.isGameOn()) {
 								s.addMistakes();
+								paneTarget.getCell().setMistakeMode(true);
 								numMistakesLabel.setText("Mistakes: " + s.getMistakes());
 								if(s.getMistakes() >= eGD.getMaxMistakes()) {
-									gameStateLabel.setText("GAME OVER");
+									gpTop.getChildren().clear();
+									Label gameOver = new Label("You Lose!");
+									gpTop.add(gameOver, 0, 0);
+									s.setGameOn(false);
 								}
 
-							}
-							if (s.isSudoku()) {
-								gameStateLabel.setText("GAME WON");
 							}
 
 							//	This is the code that is actually taking the cell value from the drag-from 
@@ -353,14 +387,55 @@ public class SudokuController implements Initializable {
 							paneTarget.getCell().setiCellValue(CellFrom.getiCellValue());
 							paneTarget.getChildren().clear();
 							paneTarget.getChildren().add(iv);
+							s.getPuzzle()[paneTarget.getCell().getiRow()][paneTarget.getCell().getiCol()] = paneTarget.getCell().getiCellValue();
+							paneTarget.getCell().setOriginal(false);
+							if (paneTarget.getCell().isMistakeMode()  && s.isGameOn()) {
+								paneTarget.getChildren().add(0, SudokuStyler.getRedPane());
+							}
 							System.out.println(CellFrom.getiCellValue());
 							success = true;
+							if (s.isSudoku()) {
+								gpTop.getChildren().clear();
+								Label gameOver = new Label("You Win!");
+								gpTop.add(gameOver, 0, 0);
+								s.setGameOn(false);
+							}
 						}
 						event.setDropCompleted(success);
 						event.consume();
 					}
 				});
-
+				// Fire this method as something is being dragged over a cell
+				// I'm checking the cell value... if it's not zero... don't let it be dropped
+				// (show the circle-with-line-through)
+				
+				trashcan.setOnDragOver(new EventHandler<DragEvent>() {
+					public void handle(DragEvent event) {
+						if (event.getGestureSource() != trashcan && event.getDragboard().hasContent(myFormat)) {
+							// Don't let the user delete items that already have a cell value set
+							if (paneTarget.getCell().isMistakeMode()) {
+								event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+							}
+						}
+						event.consume();
+					}
+				});
+//				This section will reset a cell if it's dragged into the trash.
+				trashcan.setOnDragDropped(new EventHandler<DragEvent>() {
+					public void handle(DragEvent event) {
+						Dragboard db = event.getDragboard();
+						boolean success = false;
+						//	This is the code that resets the cell
+						paneTarget.getCell().setiCellValue(0);
+						paneTarget.getChildren().clear();
+						paneTarget.getCell().setMistakeMode(false);
+						s.getPuzzle()[paneTarget.getCell().getiRow()][paneTarget.getCell().getiCol()] = 0;
+						success = true;
+						event.setDropCompleted(success);
+						event.consume();
+					}
+				});
+				
 				gridPaneSudoku.add(paneTarget, iCol, iRow); // Add the pane to the grid
 				// This is going to fire if the number from the number grid is dragged
 				// Find the cell in the pane, put it on the Dragboard
@@ -370,18 +445,36 @@ public class SudokuController implements Initializable {
 				//	implement a simliar method
 				paneTarget.setOnDragDetected(new EventHandler<MouseEvent>() {
 					public void handle(MouseEvent event) {
-
-						/* allow any transfer mode */
-						Dragboard db = paneTarget.startDragAndDrop(TransferMode.ANY);
-
-						/* put a string on dragboard */
-						// Put the Cell on the clipboard, on the other side, cast as a cell
-						ClipboardContent content = new ClipboardContent();
-						content.put(myFormat, paneTarget.getCell());
-						db.setContent(content);
-						event.consume();
+						if (s.isGameOn()) {
+							/* allow any transfer mode */
+							Dragboard db = paneTarget.startDragAndDrop(TransferMode.ANY);
+	
+							/* put a string on dragboard */
+							// Put the Cell on the clipboard, on the other side, cast as a cell
+							ClipboardContent content = new ClipboardContent();
+							content.put(myFormat, paneTarget.getCell());
+							db.setContent(content);
+							event.consume();
+						}
 					}
 				});
+				
+				paneTarget.setOnDragDone(new EventHandler <DragEvent>() {
+		            public void handle(DragEvent event) {
+		                /* if the data was successfully moved, clear it */
+		            	if (!paneTarget.getCell().isOriginal() && s.isGameOn()) {
+			            	boolean success = false;
+							//	This is the code that resets the cell
+							paneTarget.getCell().setiCellValue(0);
+							paneTarget.getChildren().clear();
+							paneTarget.getCell().setMistakeMode(false);
+							s.getPuzzle()[paneTarget.getCell().getiRow()][paneTarget.getCell().getiCol()] = 0;
+							success = true;
+							event.setDropCompleted(success);
+							event.consume();
+		            	}
+		            }
+		        });
 			}
 
 		}
